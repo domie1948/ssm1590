@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhishikuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zhishi_name as zhishiName
+        ,a.zhishi_types as zhishiTypes
+        ,a.zhishi_content as zhishiContent
+        ,a.zhishi_file as zhishiFile
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhishikuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM zhishiku  a
+
+        <where>
+            <if test=" params.zhishiName != '' and params.zhishiName != null and params.zhishiName != 'null' ">
+                and a.zhishi_name like CONCAT('%',#{params.zhishiName},'%')
+            </if>
+            <if test="params.zhishiTypes != null">
+                and a.zhishi_types = #{params.zhishiTypes}
+            </if>
+            <if test=" params.zhishiContent != '' and params.zhishiContent != null and params.zhishiContent != 'null' ">
+                and a.zhishi_content like CONCAT('%',#{params.zhishiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>
